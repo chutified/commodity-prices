@@ -22,12 +22,6 @@ func New(l *log.Logger) *CommoditiesData {
 		Commodities: make(map[string]models.Commodity),
 	}
 
-	// update
-	err := cd.Update()
-	if err != nil {
-		cd.log.Printf("[ERROR] updating data: %v", err)
-	}
-
 	return cd
 }
 
