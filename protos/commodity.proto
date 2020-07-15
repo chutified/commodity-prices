@@ -8,8 +8,8 @@ service Commodity {
 // Price request defines the request pattern.
 // Only one commodity can be queried per request for a price.
 message CommodityRequest {
-    // Commodity is a name of the searching commodity.
-    string Commodity = 1;
+    // Name is a name of the searching commodity.
+    string Name = 1;
 }
 
 // CommodityResponse defines the response pattern.
