@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/chutified/resource-finder/data"
-	"github.com/chutified/resource-finder/protos/commodity"
+	data "github.com/chutified/resource-finder/data"
+	commodity "github.com/chutified/resource-finder/protos/commodity"
 )
 
 // Commodities defines the commodity server.
@@ -35,8 +35,20 @@ func New(l *log.Logger, cd *data.CommoditiesData) *Commodities {
 func (c *Commodities) handleUpdates() {
 
 	// range updates
-	updates := c.data.MonitorData(2 * time.Minute)
+	updates, errs := c.data.MonitorData(45 * time.Second)
+
+	// errors
+	go func() {
+		for {
+			c.log.Printf("[ERROR] %v", <-errs)
+		}
+	}()
+
+	// updates
 	for range updates {
+
+		// inform
+		c.log.Printf("[UPDATE] new values")
 
 		// loop over subscribed clients
 		for clientSrv, reqs := range c.subscribtions {
@@ -69,11 +81,11 @@ func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.Commodity
 	resp, err := c.handleRequest(req)
 	if err != nil {
 		c.log.Printf("[ERROR] handling request data: %v", err)
-		return nil, fmt.Errorf("handle request: %w", err)
+		return nil, fmt.Errorf("handle request: %w", err) // TODO handle error
 	}
 
 	// success
-	c.log.Printf("Handle client request: %v", req)
+	c.log.Printf("[HANDLE] client request: %v", req)
 
 	return resp, nil
 }
@@ -87,16 +99,23 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 		// get request
 		req, err := srv.Recv()
 		if err == io.EOF {
-			c.log.Printf("client closed connection")
+			c.log.Printf("[EXIT] client closed connection")
 			break
 		}
 		if err != nil {
 			c.log.Printf("[ERROR] invalid request: %v", err)
-			return err
+			return err // TODO handle error
+		}
+
+		// validate
+		n := req.GetName()
+		if _, ok := c.data.Commodities[n]; !ok {
+			c.log.Printf("[ERROR] commodity %s not found", n)
+			continue
 		}
 
 		// success
-		c.log.Printf("Handle client subscribtion: %v", req)
+		c.log.Printf("[HANDLE] client subscribtion: %v", req)
 
 		// append a subscribtion
 		reqs, ok := c.subscribtions[srv]
