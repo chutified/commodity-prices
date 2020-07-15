@@ -1,0 +1,32 @@
+syntax="proto3";
+option go_package="github.com/chutified/resource-finder/protos;commodity";
+
+service Commodity {
+    rpc GetCommodity (stream CommodityRequest) returns (stream CommodityResponse);
+}
+
+// Price request defines the request pattern.
+// Only one commodity can be queried per request for a price.
+message CommodityRequest {
+    // Commodity is a name of the searching commodity.
+    string Commodity = 1;
+}
+
+// CommodityResponse defines the response pattern.
+message CommodityResponse {
+    // Name of the commodity.
+    string Name = 1;
+    // Current price of the commodity.
+    float Price = 2;
+    // The currency of the price.
+    string Currency = 3;
+    // The weight for which the price of the commodity is determined.
+    string WeightUnit = 4;
+    // Last change in percentages.
+    float ChangeP = 5;
+    // Last Change in a number.
+    float ChangeN = 6;
+    // Last time updated.
+    // The Unix time.
+    int64 LastUpdate = 7;
+}
