@@ -9,6 +9,8 @@ import (
 
 	data "github.com/chutified/resource-finder/data"
 	commodity "github.com/chutified/resource-finder/protos/commodity"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Commodities defines the commodity server.
@@ -81,12 +83,21 @@ func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.Commodity
 	resp, err := c.handleRequest(req)
 	if err != nil {
 		c.log.Printf("[ERROR] handling request data: %v", err)
-		return nil, fmt.Errorf("handle request: %w", err) // TODO handle error
+
+		grpcErr := status.Newf(
+			codes.NotFound,
+			"Name of the commodity \"%s\" was not found.", req.GetName(),
+		)
+		grpcErr, wde := grpcErr.WithDetails(req)
+		if wde != nil {
+			return nil, err
+		}
+
+		return nil, grpcErr.Err()
 	}
 
 	// success
 	c.log.Printf("[HANDLE] client request: %v", req)
-
 	return resp, nil
 }
 
@@ -148,7 +159,7 @@ func (c *Commodities) handleRequest(req *commodity.CommodityRequest) (*commodity
 	name := req.GetName()
 	cmd, ok := c.data.Commodities[name]
 	if !ok {
-		return nil, fmt.Errorf("commodity %s not found in the database", name)
+		return nil, fmt.Errorf("commodity %s not found", name)
 	}
 
 	// success
