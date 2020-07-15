@@ -2,7 +2,7 @@ syntax="proto3";
 option go_package=".;commodity";
 
 service Commodity {
-    //rpc GetCommodity (CommodityRequest) returns (CommodityResponse);
+    rpc GetCommodity (CommodityRequest) returns (CommodityResponse);
     rpc SubscribeCommodity (stream CommodityRequest) returns (stream CommodityResponse);
 }
 
