@@ -1,8 +1,9 @@
 syntax="proto3";
-option go_package="github.com/chutified/resource-finder/protos/Commodity";
+option go_package=".;commodity";
 
 service Commodity {
-    rpc GetCommodity (stream CommodityRequest) returns (stream CommodityResponse);
+    //rpc GetCommodity (CommodityRequest) returns (CommodityResponse);
+    rpc SubscribeCommodity (stream CommodityRequest) returns (stream CommodityResponse);
 }
 
 // Price request defines the request pattern.
