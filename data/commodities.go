@@ -6,20 +6,20 @@ import (
 	"github.com/chutified/resource-finder/models"
 )
 
-// Service is a data controller.
-type Service struct {
+// CommoditiesData is a data controller.
+type CommoditiesData struct {
 	Commodities map[string]models.Commodity
 }
 
 // New constructs a new data service.
-func New() *Service {
-	return &Service{
+func New() *CommoditiesData {
+	return &CommoditiesData{
 		Commodities: make(map[string]models.Commodity),
 	}
 }
 
 // Update updates the commodities data.
-func (s *Service) Update() error {
+func (s *CommoditiesData) Update() error {
 
 	// get current records
 	rs, err := getRecords()
