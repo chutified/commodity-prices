@@ -6,9 +6,9 @@ import (
 	"net"
 	"os"
 
-	"github.com/chutified/resource-finder/data"
-	"github.com/chutified/resource-finder/protos/commodity"
-	"github.com/chutified/resource-finder/server"
+	data "github.com/chutified/resource-finder/data"
+	commodity "github.com/chutified/resource-finder/protos/commodity"
+	server "github.com/chutified/resource-finder/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -27,7 +27,7 @@ func main() {
 	l := log.New(os.Stdout, "[COMMODITY SERVICE] ", log.LstdFlags)
 
 	// data service
-	ds := data.New(l)
+	ds := data.New()
 	err := ds.Update()
 	if err != nil {
 		l.Fatalf("[ERROR] can not update data: %v", err)
