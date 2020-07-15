@@ -1,5 +1,5 @@
 syntax="proto3";
-option go_package="github.com/chutified/resource-finder/protos;commodity";
+option go_package="github.com/chutified/resource-finder/protos/Commodity";
 
 service Commodity {
     rpc GetCommodity (stream CommodityRequest) returns (stream CommodityResponse);
