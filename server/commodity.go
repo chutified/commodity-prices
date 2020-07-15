@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -61,7 +62,20 @@ func (c *Commodities) handleUpdates() {
 	}
 }
 
-// SubscribeCommodity handles grpc calls.
+// GetCommodity handles grpc calls.
+func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.CommodityRequest) (*commodity.CommodityResponse, error) {
+
+	// handling
+	resp, err := c.handleRequest(req)
+	if err != nil {
+		c.log.Printf("[ERROR] handling request data: %v", err)
+		return nil, fmt.Errorf("handle request: %w", err)
+	}
+
+	return resp, nil
+}
+
+// SubscribeCommodity handles grpc subscription.
 func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommodityServer) error { // satisfy CommodityServer interface
 
 	// handling requests
