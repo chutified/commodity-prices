@@ -2,50 +2,81 @@ package data
 
 import (
 	"fmt"
+	"log"
+	"reflect"
+	"time"
 
 	"github.com/chutified/resource-finder/models"
 )
 
 // CommoditiesData is a data controller.
 type CommoditiesData struct {
+	log         *log.Logger
 	Commodities map[string]models.Commodity
 }
 
 // New constructs a new data service.
-func New() *CommoditiesData {
-	return &CommoditiesData{
+func New(l *log.Logger) *CommoditiesData {
+	cd := &CommoditiesData{
+		log:         l,
 		Commodities: make(map[string]models.Commodity),
 	}
+
+	// update
+	err := cd.Update()
+	if err != nil {
+		cd.log.Printf("[ERROR] updating data: %v", err)
+	}
+
+	return cd
 }
 
 // Update updates the commodities data.
-func (s *CommoditiesData) Update() error {
+func (cd *CommoditiesData) Update() error {
 
-	// get current records
-	rs, err := getRecords()
+	cmds, err := getCommodities()
 	if err != nil {
-		return fmt.Errorf("getting records: %w", err)
+		return fmt.Errorf("fetching data: %w", err)
 	}
-
-	// parse into slice of commodities
-	cmds, err := parseRecords(rs)
-	if err != nil {
-		return err
-	}
-
-	// parsu into map of commodities
-	mcmds := mapCommodities(cmds)
 
 	// success
-	s.Commodities = mcmds
+	cd.Commodities = cmds
 	return nil
 }
 
-// mapCommodities maps each commodity with its name.
-func mapCommodities(cmds []models.Commodity) map[string]models.Commodity {
-	m := make(map[string]models.Commodity)
-	for _, c := range cmds {
-		m[c.Name] = c
-	}
-	return m
+// MonitorData returns a channel which can notify if any data modification occurs.
+func (cd *CommoditiesData) MonitorData(interval time.Duration) chan struct{} {
+
+	// channel for the notification
+	ret := make(chan struct{})
+
+	go func() {
+		ticker := time.NewTicker(interval)
+		cache := make(map[string]models.Commodity)
+
+		// check every tick
+		for range ticker.C {
+
+			// update
+			err := cd.Update()
+			if err != nil {
+				cd.log.Printf("[ERROR] updating data: %v", err)
+			}
+
+			// compare
+			if !(reflect.DeepEqual(cache, cd.Commodities)) {
+
+				// update cache
+				for k, v := range cd.Commodities {
+					cache[k] = v
+				}
+
+				// inform
+				cd.log.Printf("Data updated.")
+				ret <- struct{}{}
+			}
+		}
+	}()
+
+	return ret
 }

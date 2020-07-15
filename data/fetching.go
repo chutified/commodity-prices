@@ -141,3 +141,33 @@ func parseRecords(rs []record) ([]models.Commodity, error) {
 	// success
 	return cmds, nil
 }
+
+// mapCommodities maps each commodity with its name.
+func mapCommodities(cmds []models.Commodity) map[string]models.Commodity {
+	m := make(map[string]models.Commodity)
+	for _, c := range cmds {
+		m[c.Name] = c
+	}
+	return m
+}
+
+// getCommodities returns map of current comodities.
+func getCommodities() (map[string]models.Commodity, error) {
+
+	// get current records
+	rs, err := getRecords()
+	if err != nil {
+		return nil, fmt.Errorf("getting records: %w", err)
+	}
+
+	// parse into slice of commodities
+	cmds, err := parseRecords(rs)
+	if err != nil {
+		return nil, err
+	}
+
+	// parsu into map of commodities
+	m := mapCommodities(cmds)
+
+	return m, nil
+}
