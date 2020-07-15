@@ -92,19 +92,6 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 			return err
 		}
 
-		// handling
-		resp, err := c.handleRequest(req)
-		if err != nil {
-			c.log.Printf("[ERROR] handling request data: %v", err)
-			continue
-		}
-
-		// post response
-		err = srv.Send(resp)
-		if err != nil {
-			c.log.Printf("[ERROR] sending request data: %v", err)
-		}
-
 		// success
 		c.log.Printf("Handle client request: %v", req)
 
