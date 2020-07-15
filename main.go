@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/chutified/resource-finder/data"
 	"github.com/chutified/resource-finder/protos/commodity"
 	"github.com/chutified/resource-finder/server"
 	"google.golang.org/grpc"
@@ -25,8 +26,15 @@ func main() {
 	// define logger
 	l := log.New(os.Stdout, "[COMMODITY SERVICE] ", log.LstdFlags)
 
+	// data service
+	ds := data.New(l)
+	err := ds.Update()
+	if err != nil {
+		l.Fatalf("[ERROR] can not update data: %v", err)
+	}
+
 	// service server
-	cmdSrv := server.New(l)
+	cmdSrv := server.New(l, ds)
 
 	// grpc server
 	grpcSrv := grpc.NewServer()

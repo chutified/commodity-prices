@@ -19,10 +19,10 @@ type Commodities struct {
 }
 
 // New creates a new commodity server.
-func New(l *log.Logger) *Commodities {
+func New(l *log.Logger, cd *data.CommoditiesData) *Commodities {
 	c := &Commodities{
 		log:           l,
-		data:          data.New(l),
+		data:          cd,
 		subscribtions: make(map[commodity.Commodity_SubscribeCommodityServer][]*commodity.CommodityRequest),
 	}
 
@@ -72,6 +72,9 @@ func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.Commodity
 		return nil, fmt.Errorf("handle request: %w", err)
 	}
 
+	// success
+	c.log.Printf("Handle client request: %v", req)
+
 	return resp, nil
 }
 
@@ -93,7 +96,7 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 		}
 
 		// success
-		c.log.Printf("Handle client request: %v", req)
+		c.log.Printf("Handle client subscribtion: %v", req)
 
 		// append a subscribtion
 		reqs, ok := c.subscribtions[srv]
@@ -139,6 +142,5 @@ func (c *Commodities) handleRequest(req *commodity.CommodityRequest) (*commodity
 		ChangeN:    cmd.ChangeN,
 		LastUpdate: cmd.LastUpdate.Unix(),
 	}
-
 	return resp, nil
 }
