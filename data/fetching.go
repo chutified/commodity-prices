@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/chutified/resource-finder/models"
+	models "github.com/chutified/resource-finder/models"
 )
 
 // record defines the raw data from the website.
