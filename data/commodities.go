@@ -18,7 +18,6 @@ func New() *CommoditiesData {
 	cd := &CommoditiesData{
 		Commodities: make(map[string]models.Commodity),
 	}
-
 	return cd
 }
 
