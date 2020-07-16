@@ -61,6 +61,7 @@ README TODO:
     docker run
 
 TODO:
+config file
 testing
 error handling
 docker

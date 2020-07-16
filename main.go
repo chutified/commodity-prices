@@ -35,7 +35,7 @@ func main() {
 
 	// service server
 	cmdSrv := server.New(l, ds)
-	cmdSrv.HandleUpdates()
+	go cmdSrv.HandleUpdates()
 
 	// grpc server
 	grpcSrv := grpc.NewServer()
@@ -51,6 +51,7 @@ func main() {
 	}
 
 	// start listening
+	l.Printf("Listening on %s:%d", cfg.Host, cfg.Port)
 	err = grpcSrv.Serve(lst)
 	if err != nil {
 		l.Panicf("listening: %v", err)
