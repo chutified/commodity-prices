@@ -17,14 +17,17 @@ import (
 func main() {
 
 	// get config from the file
-	cfg := *config.GetConfig()
+	cfg, err := *config.GetConfig("config.yaml")
+	if err != nil {
+		l.Fatalf("[ERROR] get configuration: %v", err)
+	}
 
 	// define logger
 	l := log.New(os.Stdout, "[COMMODITY SERVICE] ", log.LstdFlags)
 
 	// data service
 	ds := data.New()
-	err := ds.Update()
+	err = ds.Update()
 	if err != nil {
 		l.Fatalf("[ERROR] can not update data: %v", err)
 	}
