@@ -1,9 +1,12 @@
 syntax="proto3";
+
+import "google/rpc/status.proto";
+
 option go_package=".;commodity";
 
 service Commodity {
     rpc GetCommodity (CommodityRequest) returns (CommodityResponse);
-    rpc SubscribeCommodity (stream CommodityRequest) returns (stream CommodityResponse);
+    rpc SubscribeCommodity (stream CommodityRequest) returns (stream StreamingCommodityResponse);
 }
 
 // Price request defines the request pattern.
@@ -30,4 +33,11 @@ message CommodityResponse {
     // Last time updated.
     // The Unix time.
     int64 LastUpdate = 7;
+}
+
+message StreamingCommodityResponse {
+    oneof message{
+        CommodityResponse commodity_response = 1;
+        google.rpc.Status error = 2;
+    }
 }

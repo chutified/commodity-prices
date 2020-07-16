@@ -60,11 +60,35 @@ func (c *Commodities) HandleUpdates() {
 				resp, err := c.handleRequest(req)
 				if err != nil {
 					c.log.Printf("[ERROR] handle request data: %v", err)
+
+					// handle grpc error
+					gErr := status.Newf(
+						codes.NotFound,
+						"Name of the commodity \"%s\" was not found.", req.GetName(),
+					)
+					gErr, wde := gErr.WithDetails(req)
+					if wde != nil {
+						c.log.Printf("[ERROR] unable to add metadata to error: %v", wde)
+					}
+					err = clientSrv.Send(&commodity.StreamingCommodityResponse{
+						Message: &commodity.StreamingCommodityResponse_Error{
+							Error: gErr.Proto(),
+						},
+					})
+					if err != nil {
+						c.log.Printf("[ERROR] send request data: %v", err)
+						continue
+					}
+
 					continue
 				}
 
 				// post response
-				err = clientSrv.Send(resp)
+				err = clientSrv.Send(&commodity.StreamingCommodityResponse{
+					Message: &commodity.StreamingCommodityResponse_CommodityResponse{
+						CommodityResponse: resp,
+					},
+				})
 				if err != nil {
 					c.log.Printf("[ERROR] send request data: %v", err)
 					continue
@@ -82,16 +106,16 @@ func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.Commodity
 	if err != nil {
 		c.log.Printf("[ERROR] handle request data: %v", err)
 
-		grpcErr := status.Newf(
+		gErr := status.Newf(
 			codes.NotFound,
 			"Name of the commodity \"%s\" was not found.", req.GetName(),
 		)
-		grpcErr, wde := grpcErr.WithDetails(req)
+		gErr, wde := gErr.WithDetails(req)
 		if wde != nil {
 			return nil, err
 		}
 
-		return nil, grpcErr.Err()
+		return nil, gErr.Err()
 	}
 
 	// success
@@ -112,15 +136,27 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 			break
 		}
 		if err != nil {
-			c.log.Printf("[ERROR] invalid request: %v", err)
-			return err // TODO handle error
+			c.log.Printf("[ERROR] invalid request format: %v", err)
+			return err
 		}
 
-		// validate
+		// validate if error occurs, terminate the request
 		n := req.GetName()
 		if _, ok := c.data.Commodities[n]; !ok {
 			c.log.Printf("[ERROR] commodity %s not found", n)
-			continue // TODO error handle
+
+			// handle grpc error
+			gStatus := status.Newf(
+				codes.NotFound,
+				"Commodity %s was not found.", n,
+			)
+			gStatus.WithDetails(req)
+			srv.Send(&commodity.StreamingCommodityResponse{
+				Message: &commodity.StreamingCommodityResponse_Error{
+					Error: gStatus.Proto(),
+				},
+			})
+			continue
 		}
 
 		// append a subscribtion
@@ -129,22 +165,38 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 			c.subscribtions[srv] = []*commodity.CommodityRequest{}
 		}
 
-		subscribed := false
+		// skip if already subscribed
+		var validErr *status.Status
 		for _, v := range reqs {
 			if v.GetName() == req.GetName() {
-				subscribed = true
+				c.log.Printf("[ERROR] client already subscribe for: %s", v.GetName())
+
+				// err
+				validErr = status.Newf(
+					codes.AlreadyExists,
+					"Client is already subscribed for commodity:\"%s\"", v.GetName(),
+				)
+				// add original request
+				var wde error
+				validErr, wde = validErr.WithDetails(req)
+				if wde != nil {
+					c.log.Printf("[ERROR] unable to add metadata to error: %v", wde)
+				}
 				break
 			}
 		}
-
-		// skip if already subscribed
-		if !subscribed {
-			c.subscribtions[srv] = append(reqs, req)
-		} else {
-			// TODO error handle
+		// if validErr exists rettuns error and continue
+		if validErr != nil {
+			srv.Send(&commodity.StreamingCommodityResponse{
+				Message: &commodity.StreamingCommodityResponse_Error{
+					Error: validErr.Proto(),
+				},
+			})
+			continue
 		}
 
 		// success
+		c.subscribtions[srv] = append(reqs, req)
 		c.log.Printf("[SUCCESS] client subscribed: %v", req)
 	}
 
