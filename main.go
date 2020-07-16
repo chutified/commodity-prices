@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 
+	config "github.com/chutified/resource-finder/config"
 	data "github.com/chutified/resource-finder/data"
 	commodity "github.com/chutified/resource-finder/protos/commodity"
 	server "github.com/chutified/resource-finder/server"
@@ -13,15 +14,10 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-var cfg = struct {
-	Host string
-	Port int
-}{
-	Host: "127.0.0.1",
-	Port: 10501,
-}
-
 func main() {
+
+	// get config from the file
+	cfg := *config.GetConfig()
 
 	// define logger
 	l := log.New(os.Stdout, "[COMMODITY SERVICE] ", log.LstdFlags)
@@ -47,11 +43,11 @@ func main() {
 	// define listen
 	lst, err := net.Listen("tcp", fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
 	if err != nil {
-		l.Fatalf("define listening: %v", err)
+		l.Fatalf("[ERROR] define listening: %v", err)
 	}
 
 	// start listening
-	l.Printf("Listening on %s:%d", cfg.Host, cfg.Port)
+	l.Printf("[SUCCESS] Listening on %s:%d", cfg.Host, cfg.Port)
 	err = grpcSrv.Serve(lst)
 	if err != nil {
 		l.Panicf("listening: %v", err)
