@@ -35,6 +35,7 @@ func main() {
 
 	// service server
 	cmdSrv := server.New(l, ds)
+	cmdSrv.HandleUpdates()
 
 	// grpc server
 	grpcSrv := grpc.NewServer()

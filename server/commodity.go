@@ -28,13 +28,11 @@ func New(l *log.Logger, cd *data.CommoditiesData) *Commodities {
 		subscribtions: make(map[commodity.Commodity_SubscribeCommodityServer][]*commodity.CommodityRequest),
 	}
 
-	go c.handleUpdates()
-
 	return c
 }
 
-// handleUpdates post for each subscribed client the update
-func (c *Commodities) handleUpdates() {
+// HandleUpdates post for each subscribed client the update
+func (c *Commodities) HandleUpdates() {
 
 	// range updates
 	updates, errs := c.data.MonitorData(45 * time.Second)
@@ -50,7 +48,7 @@ func (c *Commodities) handleUpdates() {
 	for range updates {
 
 		// inform
-		c.log.Printf("[UPDATE] new values")
+		c.log.Printf("[UPDATE] send new values to subscribers")
 
 		// loop over subscribed clients
 		for clientSrv, reqs := range c.subscribtions {
@@ -61,14 +59,14 @@ func (c *Commodities) handleUpdates() {
 				// handling
 				resp, err := c.handleRequest(req)
 				if err != nil {
-					c.log.Printf("[ERROR] handling request data: %v", err)
+					c.log.Printf("[ERROR] handle request data: %v", err)
 					continue
 				}
 
 				// post response
 				err = clientSrv.Send(resp)
 				if err != nil {
-					c.log.Printf("[ERROR] sending request data: %v", err)
+					c.log.Printf("[ERROR] send request data: %v", err)
 					continue
 				}
 			}
@@ -82,7 +80,7 @@ func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.Commodity
 	// handling
 	resp, err := c.handleRequest(req)
 	if err != nil {
-		c.log.Printf("[ERROR] handling request data: %v", err)
+		c.log.Printf("[ERROR] handle request data: %v", err)
 
 		grpcErr := status.Newf(
 			codes.NotFound,
@@ -97,7 +95,7 @@ func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.Commodity
 	}
 
 	// success
-	c.log.Printf("[HANDLE] client request: %v", req)
+	c.log.Printf("[SUCCESS] respond to the client's GetCommodity request: %s", req.GetName())
 	return resp, nil
 }
 
@@ -122,11 +120,8 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 		n := req.GetName()
 		if _, ok := c.data.Commodities[n]; !ok {
 			c.log.Printf("[ERROR] commodity %s not found", n)
-			continue
+			continue // TODO error handle
 		}
-
-		// success
-		c.log.Printf("[HANDLE] client subscribtion: %v", req)
 
 		// append a subscribtion
 		reqs, ok := c.subscribtions[srv]
@@ -135,8 +130,8 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 		}
 
 		subscribed := false
-		for _, r := range reqs {
-			if r.GetName() == req.GetName() {
+		for _, v := range reqs {
+			if v.GetName() == req.GetName() {
 				subscribed = true
 				break
 			}
@@ -145,7 +140,12 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 		// skip if already subscribed
 		if !subscribed {
 			c.subscribtions[srv] = append(reqs, req)
+		} else {
+			// TODO error handle
 		}
+
+		// success
+		c.log.Printf("[SUCCESS] client subscribed: %v", req)
 	}
 
 	// break
