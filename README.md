@@ -2,7 +2,7 @@ RULES >>>>>>>>>>>>>>>
     request name must be completely lowercase (case sensitive)
 
 SOURCE >>>>>>>>>>>>>>>
-    https://markets.businessinsider.com/commodities
+    https://markets.businessinsider.com/commodities (website crawl)
 
 SUPPORTED COMMODITIES >>>>>>>>>>>>>>>
 precious metals:
@@ -61,8 +61,4 @@ README TODO:
     docker run
 
 TODO:
-config file
-testing
-error handling
-docker
-makefile
+client
