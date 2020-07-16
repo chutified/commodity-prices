@@ -1,9 +1,5 @@
 .PHONY: clean, protogen, build, run
 
-clean:
-	go mod tidy
-	go mod download
-
 protogen:
 	protoc -I protos/ --go_out=plugins=grpc:protos/commodity/ protos/commodity.proto
 
