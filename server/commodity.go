@@ -141,7 +141,7 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 func (c *Commodities) HandleUpdates() {
 
 	// range updates
-	updates, errs := c.data.MonitorData(45 * time.Second)
+	updates, errs := c.data.MonitorData(15 * time.Second)
 
 	// errors
 	go func() {
