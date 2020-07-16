@@ -31,73 +31,6 @@ func New(l *log.Logger, cd *data.CommoditiesData) *Commodities {
 	return c
 }
 
-// HandleUpdates post for each subscribed client the update
-func (c *Commodities) HandleUpdates() {
-
-	// range updates
-	updates, errs := c.data.MonitorData(45 * time.Second)
-
-	// errors
-	go func() {
-		for {
-			c.log.Printf("[ERROR] %v", <-errs)
-		}
-	}()
-
-	// updates
-	for range updates {
-
-		// inform
-		c.log.Printf("[UPDATE] send new values to subscribers")
-
-		// loop over subscribed clients
-		for clientSrv, reqs := range c.subscribtions {
-
-			// loop over client's requests
-			for _, req := range reqs {
-
-				// handling
-				resp, err := c.handleRequest(req)
-				if err != nil {
-					c.log.Printf("[ERROR] handle request data: %v", err)
-
-					// handle grpc error
-					gErr := status.Newf(
-						codes.NotFound,
-						"Name of the commodity \"%s\" was not found.", req.GetName(),
-					)
-					gErr, wde := gErr.WithDetails(req)
-					if wde != nil {
-						c.log.Printf("[ERROR] unable to add metadata to error: %v", wde)
-					}
-					err = clientSrv.Send(&commodity.StreamingCommodityResponse{
-						Message: &commodity.StreamingCommodityResponse_Error{
-							Error: gErr.Proto(),
-						},
-					})
-					if err != nil {
-						c.log.Printf("[ERROR] send request data: %v", err)
-						continue
-					}
-
-					continue
-				}
-
-				// post response
-				err = clientSrv.Send(&commodity.StreamingCommodityResponse{
-					Message: &commodity.StreamingCommodityResponse_CommodityResponse{
-						CommodityResponse: resp,
-					},
-				})
-				if err != nil {
-					c.log.Printf("[ERROR] send request data: %v", err)
-					continue
-				}
-			}
-		}
-	}
-}
-
 // GetCommodity handles grpc calls.
 func (c *Commodities) GetCommodity(ctx context.Context, req *commodity.CommodityRequest) (*commodity.CommodityResponse, error) {
 
@@ -202,6 +135,73 @@ func (c *Commodities) SubscribeCommodity(srv commodity.Commodity_SubscribeCommod
 
 	// break
 	return nil
+}
+
+// HandleUpdates post for each subscribed client the update
+func (c *Commodities) HandleUpdates() {
+
+	// range updates
+	updates, errs := c.data.MonitorData(45 * time.Second)
+
+	// errors
+	go func() {
+		for {
+			c.log.Printf("[ERROR] %v", <-errs)
+		}
+	}()
+
+	// updates
+	for range updates {
+
+		// inform
+		c.log.Printf("[UPDATE] send new values to subscribers")
+
+		// loop over subscribed clients
+		for clientSrv, reqs := range c.subscribtions {
+
+			// loop over client's requests
+			for _, req := range reqs {
+
+				// handling
+				resp, err := c.handleRequest(req)
+				if err != nil {
+					c.log.Printf("[ERROR] handle request data: %v", err)
+
+					// handle grpc error
+					gErr := status.Newf(
+						codes.NotFound,
+						"Name of the commodity \"%s\" was not found.", req.GetName(),
+					)
+					gErr, wde := gErr.WithDetails(req)
+					if wde != nil {
+						c.log.Printf("[ERROR] unable to add metadata to error: %v", wde)
+					}
+					err = clientSrv.Send(&commodity.StreamingCommodityResponse{
+						Message: &commodity.StreamingCommodityResponse_Error{
+							Error: gErr.Proto(),
+						},
+					})
+					if err != nil {
+						c.log.Printf("[ERROR] send request data: %v", err)
+						continue
+					}
+
+					continue
+				}
+
+				// post response
+				err = clientSrv.Send(&commodity.StreamingCommodityResponse{
+					Message: &commodity.StreamingCommodityResponse_CommodityResponse{
+						CommodityResponse: resp,
+					},
+				})
+				if err != nil {
+					c.log.Printf("[ERROR] send request data: %v", err)
+					continue
+				}
+			}
+		}
+	}
 }
 
 // handleRequest handles the request and returns the appropriate response.
