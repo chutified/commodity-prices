@@ -26,13 +26,13 @@ func GetConfig(path string) (*Config, error) {
 	}
 
 	// decode config file
-	var cfg *Config
-	err = yaml.Unmarshal(bs, cfg)
+	var cfg Config
+	err = yaml.Unmarshal(bs, &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("could not decode config file content: %w", err)
 	}
 
-	return cfg, nil
+	return &cfg, nil
 }
 
 // rootDir returns the path of the root directory.

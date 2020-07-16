@@ -16,14 +16,14 @@ import (
 
 func main() {
 
+	// define logger
+	l := log.New(os.Stdout, "[COMMODITY SERVICE] ", log.LstdFlags)
+
 	// get config from the file
-	cfg, err := *config.GetConfig("config.yaml")
+	cfg, err := config.GetConfig("config.yaml")
 	if err != nil {
 		l.Fatalf("[ERROR] get configuration: %v", err)
 	}
-
-	// define logger
-	l := log.New(os.Stdout, "[COMMODITY SERVICE] ", log.LstdFlags)
 
 	// data service
 	ds := data.New()
