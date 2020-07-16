@@ -49,14 +49,19 @@ agriculture:
     wheat
     sugar
 
+README TODO:
+    directory structure
+    documentation (endpoints)
+    grpcurl examples
+    log messages screenshots
+    requirements
+    run
+    test output
+    client examples
+    docker run
+
 TODO:
-client examples
 testing
 error handling
-directory structure
-documentation (endpoints)
-grpcurl examples
-log messages screenshots
-requirements
-run
-test output
+docker
+makefile
