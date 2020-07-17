@@ -1,11 +1,10 @@
 # Commodity Prices
-The Commodity-Prices is a microservice, which is using <a href="https://grpc.io/" target="_blank">gRPC technology</a>. It supports both unary and bidirectional calls, which aloows data updates every 15 seconds.
+The Commodity-Prices is a microservice, which is using <a href="https://grpc.io/" target="_blank">gRPC technology</a>. It supports both unary and bidirectional calls, which allows data updates every 15 seconds.
 It provides the current market prices for supported commodities. When an error occurs, it can handle it in a non-fatal way with the error messages.
 
 The whole service is containerized using a Docker engine and everything can be easily run and deployed with the pre-prepared make commnads in the Makefile.
 
 The Commodity-Prices obtains all necessary data for the proper function of the service from the <a href="https://markets.businessinsider.com/commodities" target="_blank">Business Insider</a> website. The algorithem does not infringe any copyrights nor the websites robots exclusion protocol.
-
 
 ## Installation
 
@@ -79,54 +78,19 @@ __Note:__
 _The CommodityRequest holds the key "Name" and its value is case sensitive.
 All commodity names must be completely lowercase, otherwise the item will not be found._
 
-
-## Directory structure
-```bash
-/
-├── config
-│   ├── tests
-│   │   └── config_invalid.yaml
-│   ├── config.go
-│   └── config_test.go
-├── data
-│   ├── commodities.go
-│   ├── commodities_test.go
-│   └── fetching.go
-├── models
-│   └── commodity.go
-├── protos
-│   ├── commodity
-│   │   └── commodity.pb.go
-│   ├── google
-│   │   └── rpc
-│   │       └── status.proto
-│   └── commodity.proto
-├── server
-│   ├── commodity.go
-│   └── commodity_test.go
-├── config.yaml
-├── Dockerfile
-├── go.mod
-├── go.sum
-├── main.go
-├── Makefile
-└── README.md 
-```
-
 ## Usage
 
-#### GetCommodity:
+### GetCommodity:
+GetCommodity responds immediatly to the request and uses the latest data.
 
-__CommodityRequest__:
-
-It only needs the name of the sought commodity, options are <a href="">commodities</a>.
+__CommodityRequest__ only needs the name of the sought commodity, options are <a href="https://github.com/chutified/commodity-prices#supported-commodities">commodities</a>.
 ```json
 {
     "Name": "nickel"
 }
 ```
 
-CommodityResponse
+__CommodityResponse__ holds the name of the comodity that was requested and its current market price per the returned unit. Response also has data about the last update: Unix time, change in the percentages and the float.
 ```json
 {
     "Name": "nickel",
@@ -138,26 +102,68 @@ CommodityResponse
     "LastUpdate": "1594771200"
 }
 ```
-CC: the response holds the name which was entered in the request, current price of the commodity on the market per weight unit, the last changes in percentages and a number, and the unix time of the last update.
 
-SubscribeCommodity
+### SubscribeCommodity
 
-Works similarly as the GetCommodity call. It receivs the stream of CommodityRequests, but does not react instantly (for that there is a GetCommodity service). Service register request as a subscribtion and whenever the data of the source gets update, it automatically sends every subscribed commodities responses to each client.
+SubscribeCommodity does not respond immediatly to the request but only when the commodity data are updated. It receivs the stream of CommodityRequests as the subscribtions of the cliet for the commodities.
 
-For example:
+__stream CommodityRequest__ adds the client to the subscribtion list for the certain commoditiy.
+```bash
+    {"Name":"gold"}
+    {"Name":"silver"}
+    {"Name":"platinum"}
+```
 
-    Client_1 subscribed for: "gold", "silver", "platinum"
-    Client_2 subscribed for: "milk", "rice", "corn"
+__stream CommodityResponse__ are CommodityResponses which are sent when the <a href="https://markets.businessinsider.com/commodities" target="_blank">source</a> get new values.
+```bash
+{"Name":"gold"}
+{"Name":"silver"}
+{"Name":"platinum"}
+{
+    "commodityResponse": {
+        "Name": "gold",
+        "Price": 1808.75,
+        "Currency": "USD",
+        "WeightUnit": "troy ounce",
+        "ChangeP": 0.6,
+        "ChangeN": 10.86,
+        "LastUpdate": "1594992300"
+    }
+}
+{
+    "commodityResponse": {
+        "Name": "silver",
+        "Price": 19.36,
+        "Currency": "USD",
+        "WeightUnit": "troy ounce",
+        "ChangeP": 1.28,
+        "ChangeN": 0.24,
+        "LastUpdate": "1594992300"
+    }
+}
+{
+    "commodityResponse": {
+        "Name": "platinum",
+        "Price": 839,
+        "Currency": "USD",
+        "WeightUnit": "troy ounce",
+        "ChangeP": 1.45,
+        "ChangeN": 12,
+        "LastUpdate": "1594992300"
+    }
+}
+```
+```bash
+[COMMODITY SERVICE] 2020/07/17 19:28:09 [SUCCESS] Listening on 127.0.0.1:10501
+[COMMODITY SERVICE] 2020/07/17 19:28:30 [SUCCESS] client subscribed: Name:"gold"
+[COMMODITY SERVICE] 2020/07/17 19:28:37 [SUCCESS] client subscribed: Name:"silver"
+[COMMODITY SERVICE] 2020/07/17 19:28:47 [SUCCESS] client subscribed: Name:"platinum"
+[COMMODITY SERVICE] 2020/07/17 19:39:12 [UPDATE] send new values to subscribers
+```
 
->>> DATA get updates
+## Examples
 
-    Client_1 receivs responses for: "gold", "silver", "platinum"
-    Client_2 receivs responses for: "milk", "rice", "corn"
-
-EXAMPLES >>>>>>>>>>>>>>>
-
-For these examples the grpcurl tool is used to generate binary calls to gRPC servers.
-The real use of gRPC client can be found here.
+For these examples, we are using the tool called <a href="https://github.com/fullstorydev/grpcurl" target="_blank">gRPCurl</a> to generate binary calls to gRPC servers.
 
 GetCommodity responses on the CommodityRequests, which has one field Name.
 ```bash
@@ -225,7 +231,40 @@ When the source gets an update.
 
 ```
 
-ERROR HANDLING >>>>>>>>>>>>>>>
+## Directory structure
+```bash
+/
+├── config
+│   ├── tests
+│   │   └── config_invalid.yaml
+│   ├── config.go
+│   └── config_test.go
+├── data
+│   ├── commodities.go
+│   ├── commodities_test.go
+│   └── fetching.go
+├── models
+│   └── commodity.go
+├── protos
+│   ├── commodity
+│   │   └── commodity.pb.go
+│   ├── google
+│   │   └── rpc
+│   │       └── status.proto
+│   └── commodity.proto
+├── server
+│   ├── commodity.go
+│   └── commodity_test.go
+├── config.yaml
+├── Dockerfile
+├── go.mod
+├── go.sum
+├── main.go
+├── Makefile
+└── README.md 
+```
+
+## Error handling
 ```bash
 [tommychu@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"invalid"}' 127.0.0.1:10501 Commodity.GetCommodity
 ERROR:
@@ -257,38 +296,4 @@ Server logs:
 [COMMODITY SERVICE] 2020/07/17 09:31:47 [ERROR] handle request data: commodity invalid not found
 [COMMODITY SERVICE] 2020/07/17 09:31:56 [ERROR] commodity invalid not found
 [COMMODITY SERVICE] 2020/07/17 09:32:08 [EXIT] client closed connection
-```
-
-SERVICE DEFINITION >>>>>>>>>>>>>>>
-commodity.proto
-```proto
-syntax="proto3";
-import "google/rpc/status.proto";
-option go_package=".;commodity";
-
-service Commodity {
-    rpc GetCommodity (CommodityRequest) returns (CommodityResponse);
-    rpc SubscribeCommodity (stream CommodityRequest) returns (stream StreamingCommodityResponse);
-}
-
-message CommodityRequest {
-    string Name = 1;
-}
-
-message CommodityResponse {
-    string Name = 1;
-    float Price = 2;
-    string Currency = 3;
-    string WeightUnit = 4;
-    float ChangeP = 5;
-    float ChangeN = 6;
-    int64 LastUpdate = 7;
-}
-
-message StreamingCommodityResponse {
-    oneof message{
-        CommodityResponse commodity_response = 1;
-        google.rpc.Status error = 2;
-    }
-}
 ```
