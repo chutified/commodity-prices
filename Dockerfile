@@ -21,7 +21,6 @@ RUN go mod tidy
 RUN go build -o main .
 
 
-
 FROM alpine:latest AS production
 
 # set enviroment

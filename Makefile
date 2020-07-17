@@ -7,4 +7,4 @@ build:
 	docker build -t commodity_prices .
 
 run:
-	docker run -it -p 10501:10501 --name commoditysrv --rm commodity_prices
+	docker run -it --network="host" --name commoditysrv --rm commodity_prices
