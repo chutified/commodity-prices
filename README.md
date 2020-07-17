@@ -1,4 +1,11 @@
-# Commodity
+# Commodity Prices
+The Commodity-Prices is a microservice, which is using <a href="https://grpc.io/" target="_blank">gRPC technology</a>. It supports both unary and bidirectional calls, which aloows data updates every 15 seconds.
+It provides the current market prices for supported commodities. When an error occurs, it can handle it in a non-fatal way with the error messages.
+
+The whole service is containerized using a Docker engine and everything can be easily run and deployed with the pre-prepared make commnads in the Makefile.
+
+The Commodity-Prices obtains all necessary data for the proper function of the service from the <a href="https://markets.businessinsider.com/commodities" target="_blank">Business Insider</a> website. The algorithem does not infringe any copyrights nor the websites robots exclusion protocol.
+
 
 ## Installation
 
@@ -6,133 +13,74 @@
 - <a href="https://git-scm.com/downloads" target="_blank">Git</a>
 - <a href="https://docs.docker.com/get-docker/" target="_blank">Docker Engine</a>
 
-### On Linux
+### Linux/Mac
+This is the exact way to download and run the service. On a Windows machine, the installation process would be slightly different.
 ```bash
 $ git clone https://github.com/chutified/commodity-prices.git     # download repository
-$ cd commodity-prices         # move to the repository dir
-$ make build                  # build docker the image
-$ make run                    # initialize the service
+$ cd commodity-prices         # move to repository dir
+$ make build                  # build docker image
+$ make run                    # initialize service
 ```
 
-## Source
-crawling:
-https://markets.businessinsider.com/commodities
-
-RULES >>>>>>>>>>>>>>>
-
-request name must be completely lowercase (case sensitive)
-
-SOURCE >>>>>>>>>>>>>>>
-
-    https://markets.businessinsider.com/commodities (website crawl)
-
-SUPPORTED COMMODITIES >>>>>>>>>>>>>>>
-
+## Supported commodities
 <table>
-<tr>
-    td{gold}
-    td{palladium}
-    td{platinum}
-    td{rhodium}
-    td{silver}
-    td{natural gas (henry hub)}
-    td{ethanol}
-    td{heating oil}
-</tr>
-<tr>
-    td{coal}
-    td{rbob gasoline}
-    td{uranium}
-    td{oil (brent)}
-    td{oil (wti)}
-    td{aluminium}
-    td{lead}
-    td{iron ore}
-</tr>
-<tr>
-    td{copper}
-    td{nickel}
-    td{zinc}
-    td{tin}
-    td{cotton}
-    td{oats}
-    td{lumber}
-    td{coffee}
-</tr>
-<tr>
-    td{cocoa}
-    td{live cattle}
-    td{lean hog}
-    td{cord}
-    td{feeder cattle}
-    td{milk}
-    td{orange juice}
-    td{palm oil}
-</tr>
-<tr>
-    td{rapeseed}
-    td{rice}
-    td{soybean meal}
-    td{soybeans}
-    td{soybean oil}
-    td{wheat}
-    td{sugar}
-</tr>
+    <tr>
+        <td>gold</td>
+        <td>palladium</td>
+        <td>platinum</td>
+        <td>rhodium</td>
+        <td>silver</td>
+        <td>natural gas (henry hub)</td>
+        <td>ethanol</td>
+        <td>heating oil</td>
+    </tr>
+    <tr>
+        <td>coal</td>
+        <td>rbob gasoline</td>
+        <td>uranium</td>
+        <td>oil (brent)</td>
+        <td>oil (wti)</td>
+        <td>aluminium</td>
+        <td>lead</td>
+        <td>iron ore</td>
+    </tr>
+    <tr>
+        <td>copper</td>
+        <td>nickel</td>
+        <td>zinc</td>
+        <td>tin</td>
+        <td>cotton</td>
+        <td>oats</td>
+        <td>lumber</td>
+        <td>coffee</td>
+    </tr>
+    <tr>
+        <td>cocoa</td>
+        <td>live cattle</td>
+        <td>lean hog</td>
+        <td>cord</td>
+        <td>feeder cattle</td>
+        <td>milk</td>
+        <td>orange juice</td>
+        <td>palm oil</td>
+    </tr>
+    <tr>
+        <td>rapeseed</td>
+        <td>rice</td>
+        <td>soybean meal</td>
+        <td>soybeans</td>
+        <td>soybean oil</td>
+        <td>wheat</td>
+        <td>sugar</td>
+    </tr>
 </table>
 
-precious metals:
+__Note:__
+_The CommodityRequest holds the key "Name" and its value is case sensitive.
+All commodity names must be completely lowercase, otherwise the item will not be found._
 
-    gold
-    palladium
-    platinum
-    rhodium
-    silver
 
-energy:
-
-    natural gas (henry hub)
-    ethanol
-    heating oil
-    coal
-    rbob gasoline
-    uranium
-    oil (brent)
-    oil (wti)
-
-industrial metals:
-
-    aluminium
-    lead
-    iron ore
-    copper
-    nickel
-    zinc
-    tin
-
-agriculture:
-
-    cotton
-    oats
-    lumber
-    coffee
-    cocoa
-    live cattle
-    lean hog
-    cord
-    feeder cattle
-    milk
-    orange juice
-    palm oil
-    rapeseed
-    rice
-    soybean meal
-    soybeans
-    soybean oil
-    wheat
-    sugar
-
-DIRECTORY STRUCTURE >>>>>>>>>>>>>>>
-
+## Directory structure
 ```bash
 /
 ├── config
@@ -165,17 +113,18 @@ DIRECTORY STRUCTURE >>>>>>>>>>>>>>>
 └── README.md 
 ```
 
-USAGE >>>>>>>>>>>>>>>
+## Usage
 
-GetCommodity:
+#### GetCommodity:
 
-CommodityRequest
+__CommodityRequest__:
+
+It only needs the name of the sought commodity, options are <a href="">commodities</a>.
 ```json
 {
-    Name: "nickel";
+    "Name": "nickel"
 }
 ```
-CC: enter the name of the commodity, supported commodities are: ...
 
 CommodityResponse
 ```json
