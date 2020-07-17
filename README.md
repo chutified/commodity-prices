@@ -1,13 +1,22 @@
-INSTALLATION >>>>>>>>>>>>>>>
+# Commodity
 
-    requirement: docker engine, git
+## Installation
 
+### Requirements
+- <a href="https://git-scm.com/downloads" target="_blank">Git</a>
+- <a href="https://docs.docker.com/get-docker/" target="_blank">Docker Engine</a>
+
+### On Linux
 ```bash
 $ git clone https://github.com/chutified/commodity-prices.git     # download repository
-$ cd commodity-prices         # move to repository dir
-$ make build                  # build docker image
+$ cd commodity-prices         # move to the repository dir
+$ make build                  # build docker the image
 $ make run                    # initialize the service
 ```
+
+## Source
+crawling:
+https://markets.businessinsider.com/commodities
 
 RULES >>>>>>>>>>>>>>>
 
