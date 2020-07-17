@@ -2,23 +2,74 @@ INSTALLATION >>>>>>>>>>>>>>>
 
     requirement: docker engine, git
 
-    git clone https://github.com/chutified/commodity-prices.git     # download repository
-
-    cd commodity-prices         # move to repository dir
-
-    make build                  # build docker image
-
-    make run                    # initialize the service
+```bash
+$ git clone https://github.com/chutified/commodity-prices.git     # download repository
+$ cd commodity-prices         # move to repository dir
+$ make build                  # build docker image
+$ make run                    # initialize the service
+```
 
 RULES >>>>>>>>>>>>>>>
 
-    request name must be completely lowercase (case sensitive)
+request name must be completely lowercase (case sensitive)
 
 SOURCE >>>>>>>>>>>>>>>
 
     https://markets.businessinsider.com/commodities (website crawl)
 
 SUPPORTED COMMODITIES >>>>>>>>>>>>>>>
+
+<table>
+<tr>
+    td{gold}
+    td{palladium}
+    td{platinum}
+    td{rhodium}
+    td{silver}
+    td{natural gas (henry hub)}
+    td{ethanol}
+    td{heating oil}
+</tr>
+<tr>
+    td{coal}
+    td{rbob gasoline}
+    td{uranium}
+    td{oil (brent)}
+    td{oil (wti)}
+    td{aluminium}
+    td{lead}
+    td{iron ore}
+</tr>
+<tr>
+    td{copper}
+    td{nickel}
+    td{zinc}
+    td{tin}
+    td{cotton}
+    td{oats}
+    td{lumber}
+    td{coffee}
+</tr>
+<tr>
+    td{cocoa}
+    td{live cattle}
+    td{lean hog}
+    td{cord}
+    td{feeder cattle}
+    td{milk}
+    td{orange juice}
+    td{palm oil}
+</tr>
+<tr>
+    td{rapeseed}
+    td{rice}
+    td{soybean meal}
+    td{soybeans}
+    td{soybean oil}
+    td{wheat}
+    td{sugar}
+</tr>
+</table>
 
 precious metals:
 
@@ -109,41 +160,41 @@ USAGE >>>>>>>>>>>>>>>
 
 GetCommodity:
 
-    CommodityRequest
-    ```json
-    {
-        Name: "nickel";
-    }
-    ```
-    CC: enter the name of the commodity, supported commodities are: ...
+CommodityRequest
+```json
+{
+    Name: "nickel";
+}
+```
+CC: enter the name of the commodity, supported commodities are: ...
 
-    CommodityResponse
-    ```json
-    {
-        "Name": "nickel",
-        "Price": 13512,
-        "Currency": "USD",
-        "WeightUnit": "ton",
-        "ChangeP": -0.24,
-        "ChangeN": -33,
-        "LastUpdate": "1594771200"
-    }
-    ```
-    CC: the response holds the name which was entered in the request, current price of the commodity on the market per weight unit, the last changes in percentages and a number, and the unix time of the last update.
+CommodityResponse
+```json
+{
+    "Name": "nickel",
+    "Price": 13512,
+    "Currency": "USD",
+    "WeightUnit": "ton",
+    "ChangeP": -0.24,
+    "ChangeN": -33,
+    "LastUpdate": "1594771200"
+}
+```
+CC: the response holds the name which was entered in the request, current price of the commodity on the market per weight unit, the last changes in percentages and a number, and the unix time of the last update.
 
 SubscribeCommodity
 
-    Works similarly as the GetCommodity call. It receivs the stream of CommodityRequests, but does not react instantly (for that there is a GetCommodity service). Service register request as a subscribtion and whenever the data of the source gets update, it automatically sends every subscribed commodities responses to each client.
+Works similarly as the GetCommodity call. It receivs the stream of CommodityRequests, but does not react instantly (for that there is a GetCommodity service). Service register request as a subscribtion and whenever the data of the source gets update, it automatically sends every subscribed commodities responses to each client.
 
-    For example:
+For example:
 
-        Client_1 subscribed for: "gold", "silver", "platinum"
-        Client_2 subscribed for: "milk", "rice", "corn"
+    Client_1 subscribed for: "gold", "silver", "platinum"
+    Client_2 subscribed for: "milk", "rice", "corn"
 
-    >>> DATA get updates
+>>> DATA get updates
 
-        Client_1 receivs responses for: "gold", "silver", "platinum"
-        Client_2 receivs responses for: "milk", "rice", "corn"
+    Client_1 receivs responses for: "gold", "silver", "platinum"
+    Client_2 receivs responses for: "milk", "rice", "corn"
 
 EXAMPLES >>>>>>>>>>>>>>>
 
@@ -216,7 +267,70 @@ When the source gets an update.
 
 ```
 
+ERROR HANDLING >>>>>>>>>>>>>>>
+```bash
+[tommychu@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"invalid"}' 127.0.0.1:10501 Commodity.GetCommodity
+ERROR:
+    Code: NotFound
+    Message: Name of the commodity "invalid" was not found.
+    Details:
+    1)    {
+            "@type": "type.googleapis.com/CommodityRequest",
+            "Name": "invalid"
+          }
+```
+```bash
+[tommychu@localhost commodity-prices]$ grpcurl --plaintext -d @ 127.0.0.1:10501 Commodity.SubscribeCommodity
+{"Name":"invalid"}
+{
+    "error": {
+        "code": 5,
+        "message": "Commodity invalid was not found."
+    }
+}
+```
+```bash
+[tommychu@localhost commodity-prices]$ grpcurl --plaintext 127.0.0.1:10501 Commodity.SubscribeCommodity
+```
 
-README TODO:
-    client examples
-    error handling
+Server logs:
+```bash
+[COMMODITY SERVICE] 2020/07/17 09:31:15 [SUCCESS] Listening on 127.0.0.1:10501
+[COMMODITY SERVICE] 2020/07/17 09:31:47 [ERROR] handle request data: commodity invalid not found
+[COMMODITY SERVICE] 2020/07/17 09:31:56 [ERROR] commodity invalid not found
+[COMMODITY SERVICE] 2020/07/17 09:32:08 [EXIT] client closed connection
+```
+
+SERVICE DEFINITION >>>>>>>>>>>>>>>
+commodity.proto
+```proto
+syntax="proto3";
+import "google/rpc/status.proto";
+option go_package=".;commodity";
+
+service Commodity {
+    rpc GetCommodity (CommodityRequest) returns (CommodityResponse);
+    rpc SubscribeCommodity (stream CommodityRequest) returns (stream StreamingCommodityResponse);
+}
+
+message CommodityRequest {
+    string Name = 1;
+}
+
+message CommodityResponse {
+    string Name = 1;
+    float Price = 2;
+    string Currency = 3;
+    string WeightUnit = 4;
+    float ChangeP = 5;
+    float ChangeN = 6;
+    int64 LastUpdate = 7;
+}
+
+message StreamingCommodityResponse {
+    oneof message{
+        CommodityResponse commodity_response = 1;
+        google.rpc.Status error = 2;
+    }
+}
+```
