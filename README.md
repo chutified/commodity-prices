@@ -238,7 +238,7 @@ Notice the responses of the requests are not instant.
 ```
 
 ### Error handling
-The service is handling the errors the non-fatal way, so all possible endpoint errors are cover and none of them would make the server crash.
+The service is handling the errors the non-fatal way, so all possible endpoint errors are covered and none of them would make the server crash.
 
 #### Commodity.GetCommodity:
 ```bash
