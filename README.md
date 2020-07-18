@@ -73,9 +73,10 @@ $ make run                    # initialize service
         <td>sugar</td>
     </tr>
 </table>
-__Note:__
-_The CommodityRequest holds the key "Name" and its value is case sensitive.
-All commodity names must be completely lowercase, otherwise the item will not be found._
+
+**Note:**
+*The CommodityRequest holds the key "Name" and its value is case sensitive.*
+*All commodity names must be completely lowercase, otherwise the item will not be found.*
 
 ## Usage
 ### GetCommodity:
