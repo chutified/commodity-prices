@@ -2,9 +2,9 @@
 The Commodity-Prices is a microservice, which is using <a href="https://grpc.io/" target="_blank">gRPC technology</a>. It supports both unary and bidirectional calls, which allows data updates every 15 seconds.
 It provides the current market prices for supported commodities. When an error occurs, it can handle it in a non-fatal way with the error messages.
 
-The whole service is containerized using a Docker engine and everything can be easily run and deployed with the pre-prepared make commnads in the Makefile.
+The whole service is containerized using a Docker engine and everything can be easily run and deployed with the pre-prepared make commands in the Makefile.
 
-The Commodity-Prices obtains all necessary data for the proper function of the service from the <a href="https://markets.businessinsider.com/commodities" target="_blank">Business Insider</a> website. The algorithem does not infringe any copyrights nor the websites robots exclusion protocol.
+The Commodity-Prices obtains all necessary data for the proper function of the service from the <a href="https://markets.businessinsider.com/commodities" target="_blank">Business Insider</a> website. The algorithm does not infringe any copyrights nor the websites robots exclusion protocol.
 
 ## Installation
 
@@ -79,7 +79,7 @@ All commodity names must be completely lowercase, otherwise the item will not be
 
 ## Usage
 ### GetCommodity:
-GetCommodity responds immediatly to the request and uses the latest data.
+GetCommodity responds immediately to the request and uses the latest data.
 
 __CommodityRequest__ only needs the name of the sought commodity, options are <a href="https://github.com/chutified/commodity-prices#supported-commodities">commodities</a>.
 ```json
@@ -88,7 +88,7 @@ __CommodityRequest__ only needs the name of the sought commodity, options are <a
 }
 ```
 
-__CommodityResponse__ holds the name of the comodity that was requested and its current market price per the returned unit. Response also has data about the last update: Unix time, change in the percentages and the float.
+__CommodityResponse__ holds the name of the commodity that was requested and its current market price per the returned unit. Response also has data about the last update: Unix time, change in the percentages and the float.
 ```json
 {
     "Name": "nickel",
@@ -102,9 +102,9 @@ __CommodityResponse__ holds the name of the comodity that was requested and its 
 ```
 
 ### SubscribeCommodity
-SubscribeCommodity does not respond immediatly to the request but only when the commodity data are updated. It receivs the stream of CommodityRequests as the subscribtions of the cliet for the commodities.
+SubscribeCommodity does not respond immediately to the request but only when the commodity data are updated. It receivs the stream of CommodityRequests as the subscriptions of the client for the commodities.
 
-__stream CommodityRequest__ adds the client to the subscribtion list for the certain commoditiy.
+__stream CommodityRequest__ adds the client to the subscription list for the certain commodity.
 ```bash
     {"Name":"gold"}
     {"Name":"silver"}
@@ -276,7 +276,7 @@ ERROR:
 ```
 
 ## Client
-All clients can be build with the help of the <a href="https://grpc.io/docs/protoc-installation/" target="_blank">Protocol Buffer Compiler</a> with the <a href="https://grpc.io/" target="_blank">gRPC</a> plugin.
+All clients can be built with the help of the <a href="https://grpc.io/docs/protoc-installation/" target="_blank">Protocol Buffer Compiler</a> with the <a href="https://grpc.io/" target="_blank">gRPC</a> plugin.
 
 *The protobuffer of the services:* <a href="https://github.com/chutified/commodity-prices/blob/master/protos/commodity.proto">commodity.proto</a>
 
