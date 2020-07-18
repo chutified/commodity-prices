@@ -194,7 +194,7 @@ For these examples, we are using the tool called <a href="https://github.com/ful
 ```
 
 ### SubscribeCommodity
-Notice the response of the request is not instant.
+Notice the responses of the requests are not instant.
 
 #### Commodity.SubscribeCommodity: `{"Name":"feeder cattle"}{"Name":"lean hog"}`
 ```bash
@@ -267,7 +267,7 @@ ERROR:
 [chutified@localhost commodity-prices]$ grpcurl --plaintext 127.0.0.1:10501 Commodity.SubscribeCommodity
 ```
 
-#### Server logs
+#### Servers logs
 ```bash
 [COMMODITY SERVICE] 2020/07/17 09:31:15 [SUCCESS] Listening on 127.0.0.1:10501
 [COMMODITY SERVICE] 2020/07/17 09:31:47 [ERROR] handle request data: commodity invalid not found
@@ -276,7 +276,9 @@ ERROR:
 ```
 
 ## Client
-:
+All clients can be build with the help of the <a href="https://grpc.io/docs/protoc-installation/" target="_blank">Protocol Buffer Compiler</a> with the <a href="https://grpc.io/" target="_blank">gRPC</a> plugin.
+
+*The protobuffer of the services:* <a href="https://github.com/chutified/commodity-prices/blob/master/protos/commodity.proto">commodity.proto</a>
 
 ## Directory structure
 ```bash
