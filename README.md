@@ -73,13 +73,11 @@ $ make run                    # initialize service
         <td>sugar</td>
     </tr>
 </table>
-
 __Note:__
 _The CommodityRequest holds the key "Name" and its value is case sensitive.
 All commodity names must be completely lowercase, otherwise the item will not be found._
 
 ## Usage
-
 ### GetCommodity:
 GetCommodity responds immediatly to the request and uses the latest data.
 
@@ -104,7 +102,6 @@ __CommodityResponse__ holds the name of the comodity that was requested and its 
 ```
 
 ### SubscribeCommodity
-
 SubscribeCommodity does not respond immediatly to the request but only when the commodity data are updated. It receivs the stream of CommodityRequests as the subscribtions of the cliet for the commodities.
 
 __stream CommodityRequest__ adds the client to the subscribtion list for the certain commoditiy.
@@ -162,20 +159,24 @@ __stream CommodityResponse__ are CommodityResponses which are sent when the <a h
 ```
 
 ## Examples
-
 For these examples, we are using the tool called <a href="https://github.com/fullstorydev/grpcurl" target="_blank">gRPCurl</a> to generate binary calls to gRPC servers.
 
-GetCommodity responses on the CommodityRequests, which has one field Name.
+### GetCommodity
+
+#### Commodity.GetCommodity: `{"Name":"uranium"}`
 ```bash
-[tommychu@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"uranium"}' 127.0.0.1:10501 Commodity.GetCommodity
+[chutified@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"uranium"}' 127.0.0.1:10501 Commodity.GetCommodity
 {
     "Name": "uranium",
     "Price": 32.95,
     "WeightUnit": "250 pfund u308",
     "LastUpdate": "1594339200"
 }
+```
 
-[tommychu@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"rbob gasoline"}' 127.0.0.1:10501 Commodity.GetCommodity
+#### Commodity.GetCommodity: `{"Name":"rbob gasoline"}`
+```bash
+[chutified@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"rbob gasoline"}' 127.0.0.1:10501 Commodity.GetCommodity
 {
     "Name": "rbob gasoline",
     "Price": 1.23,
@@ -184,14 +185,18 @@ GetCommodity responses on the CommodityRequests, which has one field Name.
     "LastUpdate": "1594950240"
 }
 ```
+
+#### Server logs
 ```bash
 [COMMODITY SERVICE] 2020/07/17 06:12:35 [SUCCESS] Listening on 127.0.0.1:10501
 [COMMODITY SERVICE] 2020/07/17 06:12:55 [SUCCESS] respond to the client's GetCommodity request: uranium
-[COMMODITY SERVICE] 2020/07/17 06:13:55 [SUCCESS] respond to the client's GetCommodity request: rbob gasoline
+[COMMODITY SERVICE] 2020/07/17 06:13:05 [SUCCESS] respond to the client's GetCommodity request: rbob gasoline
 ```
 
-SubscribeCommodity will start subscribing a specific commodity for the client.
-Notice that the reaction of the request is not instant (fr that there is a GetCommodity call).
+### SubscribeCommodity
+Notice the response of the request is not instant.
+
+#### Commodity.SubscribeCommodity: `{"Name":"feeder cattle"}{"Name":"lean hog"}`
 ```bash
 {"Name":"feeder cattle"}
 {"Name":"lean hog"}
@@ -201,7 +206,8 @@ Notice that the reaction of the request is not instant (fr that there is a GetCo
 [COMMODITY SERVICE] 2020/07/17 06:21:50 [SUCCESS] client subscribed: Name:"feeder cattle"
 [COMMODITY SERVICE] 2020/07/17 06:22:17 [SUCCESS] client subscribed: Name:"lean hog"
 ```
-When the source gets an update.
+
+#### UPDATE
 ```bash
 [COMMODITY SERVICE] 2020/07/17 06:22:32 [UPDATE] send new values to subscribers
 ```
@@ -228,12 +234,53 @@ When the source gets an update.
         "LastUpdate": "1594857600"
     }
 }
-
 ```
+
+### Error handling
+The service is handling the errors the non-fatal way, so all possible endpoint errors are cover and none of them would make the server crash.
+
+#### Commodity.GetCommodity:
+```bash
+[chutified@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"invalid"}' 127.0.0.1:10501 Commodity.GetCommodity
+ERROR:
+    Code: NotFound
+    Message: Name of the commodity "invalid" was not found.
+    Details:
+    1)    {
+            "@type": "type.googleapis.com/CommodityRequest",
+            "Name": "invalid"
+          }
+```
+
+#### Commodity.SubscribeCommodity
+```bash
+[chutified@localhost commodity-prices]$ grpcurl --plaintext -d @ 127.0.0.1:10501 Commodity.SubscribeCommodity
+{"Name":"invalid"}
+{
+    "error": {
+        "code": 5,
+        "message": "Commodity invalid was not found."
+    }
+}
+```
+```bash
+[chutified@localhost commodity-prices]$ grpcurl --plaintext 127.0.0.1:10501 Commodity.SubscribeCommodity
+```
+
+#### Server logs
+```bash
+[COMMODITY SERVICE] 2020/07/17 09:31:15 [SUCCESS] Listening on 127.0.0.1:10501
+[COMMODITY SERVICE] 2020/07/17 09:31:47 [ERROR] handle request data: commodity invalid not found
+[COMMODITY SERVICE] 2020/07/17 09:31:56 [ERROR] commodity invalid not found
+[COMMODITY SERVICE] 2020/07/17 09:32:08 [EXIT] client closed connection
+```
+
+## Client
+:
 
 ## Directory structure
 ```bash
-/
+_
 ├── config
 │   ├── tests
 │   │   └── config_invalid.yaml
@@ -262,38 +309,4 @@ When the source gets an update.
 ├── main.go
 ├── Makefile
 └── README.md 
-```
-
-## Error handling
-```bash
-[tommychu@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"invalid"}' 127.0.0.1:10501 Commodity.GetCommodity
-ERROR:
-    Code: NotFound
-    Message: Name of the commodity "invalid" was not found.
-    Details:
-    1)    {
-            "@type": "type.googleapis.com/CommodityRequest",
-            "Name": "invalid"
-          }
-```
-```bash
-[tommychu@localhost commodity-prices]$ grpcurl --plaintext -d @ 127.0.0.1:10501 Commodity.SubscribeCommodity
-{"Name":"invalid"}
-{
-    "error": {
-        "code": 5,
-        "message": "Commodity invalid was not found."
-    }
-}
-```
-```bash
-[tommychu@localhost commodity-prices]$ grpcurl --plaintext 127.0.0.1:10501 Commodity.SubscribeCommodity
-```
-
-Server logs:
-```bash
-[COMMODITY SERVICE] 2020/07/17 09:31:15 [SUCCESS] Listening on 127.0.0.1:10501
-[COMMODITY SERVICE] 2020/07/17 09:31:47 [ERROR] handle request data: commodity invalid not found
-[COMMODITY SERVICE] 2020/07/17 09:31:56 [ERROR] commodity invalid not found
-[COMMODITY SERVICE] 2020/07/17 09:32:08 [EXIT] client closed connection
 ```
