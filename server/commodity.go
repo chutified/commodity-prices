@@ -207,11 +207,11 @@ func (c *Commodities) HandleUpdates() {
 // handleRequest handles the request and returns the appropriate response.
 func (c *Commodities) handleRequest(req *commodity.CommodityRequest) (*commodity.CommodityResponse, error) {
 
-	// search
+	// get the commodity
 	name := req.GetName()
-	cmd, ok := c.data.Commodities[name]
-	if !ok {
-		return nil, fmt.Errorf("commodity %s not found", name)
+	cmd, err := c.data.GetCommodity(name)
+	if err != nil {
+		return nil, fmt.Errorf("get commodity: %w", err)
 	}
 
 	// success

@@ -21,7 +21,20 @@ func New() *CommoditiesData {
 	return cd
 }
 
-// Update updates the commodities data.
+// GetCommodity retrieves the commodtiy from the memory.
+func (cd *CommoditiesData) GetCommodity(name string) (*models.Commodity, error) {
+
+	// search
+	cmd, ok := cd.Commodities[name]
+	if !ok {
+		return nil, fmt.Errorf("commodity %s not found", name)
+	}
+
+	// success
+	return &cmd, nil
+}
+
+// Update updates the Commodities data.
 func (cd *CommoditiesData) Update() error {
 
 	cmds, err := getCommodities()
