@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 	"time"
 
 	data "github.com/chutified/resource-finder/data"
@@ -209,6 +210,7 @@ func (c *Commodities) handleRequest(req *commodity.CommodityRequest) (*commodity
 
 	// get the commodity
 	name := req.GetName()
+	name = strings.ToLower(name)
 	cmd, err := c.data.GetCommodity(name)
 	if err != nil {
 		return nil, fmt.Errorf("get commodity: %w", err)
