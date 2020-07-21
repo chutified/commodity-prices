@@ -75,8 +75,8 @@ $ make run                    # initialize service
 </table>
 
 **Note:**
-*The CommodityRequest holds the key "Name" and its value is case sensitive.*
-*All commodity names must be completely lowercase, otherwise the item will not be found.*
+*The CommodityRequest holds the key "Name" and its value is **not** case sensitive.*
+*Commodity names must not be completely lowercase to be found.*
 
 ## Usage
 ### GetCommodity:
