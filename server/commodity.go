@@ -226,5 +226,6 @@ func (c *Commodities) handleRequest(req *commodity.CommodityRequest) (*commodity
 		ChangeN:    cmd.ChangeN,
 		LastUpdate: cmd.LastUpdate.Unix(),
 	}
+	fmt.Println("HERE", resp.Currency)
 	return resp, nil
 }

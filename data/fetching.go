@@ -106,6 +106,9 @@ func parseRecords(rs []record) ([]models.Commodity, error) {
 			return nil, fmt.Errorf("unexpected unit format: \"%s\"", r.unit)
 		}
 		currency := strings.TrimSpace(ss[0]) // Currency
+		if currency == "" {
+			currency = "USD"
+		}
 		wu := strings.TrimSpace(ss[1])
 		weightUnit := strings.ToLower(wu) // WeightUnit
 
