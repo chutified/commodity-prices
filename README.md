@@ -88,6 +88,11 @@ __CommodityRequest__ only needs the name of the sought commodity, options are <a
     "Name": "nickel"
 }
 ```
+```protobuffer
+message CommodityRequest {
+    string Name = 1;
+}
+```
 
 __CommodityResponse__ holds the name of the commodity that was requested and its current market price per the returned unit. Response also has data about the last update: Unix time, change in the percentages and the float.
 ```json
@@ -99,6 +104,17 @@ __CommodityResponse__ holds the name of the commodity that was requested and its
     "ChangeP": -0.24,
     "ChangeN": -33,
     "LastUpdate": "1594771200"
+}
+```
+```protobuffer
+message CommodityResponse {
+    string Name = 1;
+    float Price = 2;
+    string Currency = 3;
+    string WeightUnit = 4;
+    float ChangeP = 5;
+    float ChangeN = 6;
+    int64 LastUpdate = 7;
 }
 ```
 
