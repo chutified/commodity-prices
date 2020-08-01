@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	data "github.com/chutified/resource-finder/data"
-	commodity "github.com/chutified/resource-finder/protos/commodity"
+	data "github.com/chutified/commodity-prices/data"
+	commodity "github.com/chutified/commodity-prices/protos/commodity"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

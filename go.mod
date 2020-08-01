@@ -1,4 +1,4 @@
-module github.com/chutified/resource-finder
+module github.com/chutified/commodity-prices
 
 go 1.14
 

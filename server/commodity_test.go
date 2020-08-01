@@ -7,8 +7,8 @@ import (
 	"log"
 	"testing"
 
-	data "github.com/chutified/resource-finder/data"
-	commodity "github.com/chutified/resource-finder/protos/commodity"
+	data "github.com/chutified/commodity-prices/data"
+	commodity "github.com/chutified/commodity-prices/protos/commodity"
 	"gopkg.in/go-playground/assert.v1"
 )
 

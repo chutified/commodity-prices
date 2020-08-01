@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	models "github.com/chutified/resource-finder/models"
+	models "github.com/chutified/commodity-prices/models"
 )
 
 // CommoditiesData is a data controller.
