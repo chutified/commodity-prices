@@ -179,7 +179,6 @@ __stream CommodityResponse__ are CommodityResponses which are sent when the <a h
 For these examples, we will be using the tool called <a href="https://github.com/fullstorydev/grpcurl" target="_blank">gRPCurl</a> to generate binary calls to gRPC servers.
 
 ### GetCommodity
-
 #### Commodity.GetCommodity: `{"Name":"uranium"}`
 ```bash
 [chutified@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"uranium"}' 127.0.0.1:10501 Commodity.GetCommodity
