@@ -1,8 +1,8 @@
 # Commodity Prices
 The Commodity-Prices is a microservice, which is using <a href="https://grpc.io/" target="_blank">gRPC technology</a>. It supports both unary and bidirectional calls, which allows data updates every 15 seconds.
-It provides the current market prices for supported commodities. When an error occurs, it can handle it in a non-fatal way with the error messages.
+It provides the current market prices for supported commodities. When an error occurs, the service handles it in a non-fatal way with an error message.
 
-The whole service is containerized using a Docker engine and everything can be easily run and deployed with the pre-prepared make commands in the Makefile.
+The whole service is containerized using a Docker engine and everything can be easily run and deployed with the pre-prepared `make` commands in the Makefile.
 
 The Commodity-Prices obtains all necessary data for the proper function of the service from the <a href="https://markets.businessinsider.com/commodities" target="_blank">Business Insider</a> website. The algorithm does not infringe any copyrights nor the websites robots exclusion protocol.
 
@@ -13,7 +13,7 @@ The Commodity-Prices obtains all necessary data for the proper function of the s
 - <a href="https://docs.docker.com/get-docker/" target="_blank">Docker Engine</a>
 
 ### Linux/Mac
-This is the exact way to download and run the service. On a Windows machine, the installation process would be slightly different.
+The installation process on Windows machine would be slightly different.
 ```bash
 $ git clone https://github.com/chutified/commodity-prices.git     # download repository
 $ cd commodity-prices         # move to repository dir
@@ -75,14 +75,13 @@ $ make run                    # initialize service
 </table>
 
 **Note:**
-*The CommodityRequest holds the key "Name" and its value is **not** case sensitive.*
-*Commodity names must not be completely lowercase to be found.*
+*The CommodityRequest holds the key "Name" which is **not** case sensitive.*
 
 ## Usage
 ### GetCommodity:
 GetCommodity responds immediately to the request and uses the latest data.
 
-__CommodityRequest__ only needs the name of the sought commodity, options are <a href="https://github.com/chutified/commodity-prices#supported-commodities">commodities</a>.
+__CommodityRequest__ only needs the name of the commodity, options are <a href="https://github.com/chutified/commodity-prices#supported-commodities">commodities</a>.
 ```proto
 message CommodityRequest {
     string Name = 1;
@@ -94,7 +93,7 @@ message CommodityRequest {
 }
 ```
 
-__CommodityResponse__ holds the name of the commodity that was requested and its current market price per the returned unit. Response also has data about the last update: Unix time, change in the percentages and the float.
+__CommodityResponse__ holds the name of the commodity that was requested and its current market price. Response also has data about the last update: Unix time, change in the percentages and in the float.
 ```proto
 message CommodityResponse {
     string Name = 1;
@@ -176,7 +175,7 @@ __stream CommodityResponse__ are CommodityResponses which are sent when the <a h
 ```
 
 ## Examples
-For these examples, we will be using the tool called <a href="https://github.com/fullstorydev/grpcurl" target="_blank">gRPCurl</a> to generate binary calls to gRPC servers.
+For these examples, I am using the tool called <a href="https://github.com/fullstorydev/grpcurl" target="_blank">gRPCurl</a> to generate binary calls to gRPC servers.
 
 ### GetCommodity
 #### Commodity.GetCommodity: `{"Name":"uranium"}`
@@ -253,7 +252,7 @@ Notice the responses of the requests are not instant.
 ```
 
 ### Error handling
-The service is handling the errors the non-fatal way, so all possible endpoint errors are covered and none of them would make the server crash.
+The service is handling the errors the non-fatal way, so all possible endpoints' errors are covered and none of them would make the server crash.
 
 #### Commodity.GetCommodity:
 ```bash
@@ -292,7 +291,7 @@ ERROR:
 ```
 
 ## Client
-All clients can be built with the help of the <a href="https://grpc.io/docs/protoc-installation/" target="_blank">Protocol Buffer Compiler</a> with the <a href="https://grpc.io/" target="_blank">gRPC</a> plugin.
+All clients can be built with the <a href="https://grpc.io/docs/protoc-installation/" target="_blank">Protocol Buffer Compiler</a> + <a href="https://grpc.io/" target="_blank">gRPC</a> plugin.
 
 *The protobuffer of the services:* <a href="https://github.com/chutified/commodity-prices/blob/master/protos/commodity.proto">commodity.proto</a>
 
