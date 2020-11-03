@@ -1,10 +1,10 @@
 # Commodity Prices
-The Commodity-Prices is a microservice, which is using <a href="https://grpc.io/" target="_blank">gRPC technology</a>. It supports both unary and bidirectional calls, which allows data updates every 15 seconds.
+The Commodity-Prices is a service which uses <a href="https://grpc.io/" target="_blank">gRPC technology</a> to communicate. It supports both unary and bidirectional calls, which allows data update every 15 seconds.
 It provides the current market prices for supported commodities. When an error occurs, the service handles it in a non-fatal way with an error message.
 
 The whole service is containerized using a Docker engine and everything can be easily run and deployed with the pre-prepared `make` commands in the Makefile.
 
-The Commodity-Prices obtains all necessary data for the proper function of the service from the <a href="https://markets.businessinsider.com/commodities" target="_blank">Business Insider</a> website. The algorithm does not infringe any copyrights nor the websites robots exclusion protocol.
+The Commodity-Prices service obtains all necessary data from the <a href="https://markets.businessinsider.com/commodities" target="_blank">Business Insider</a> website. The algorithm does not infringe any copyrights nor the websites robots exclusion protocol.
 
 ## Installation
 
@@ -79,9 +79,9 @@ $ make run                    # initialize service
 
 ## Usage
 ### GetCommodity:
-GetCommodity responds immediately to the request and uses the latest data.
+GetCommodity responds immediately to the request with the latest updated data.
 
-__CommodityRequest__ only needs the name of the commodity, options are <a href="https://github.com/chutified/commodity-prices#supported-commodities">commodities</a>.
+__CommodityRequest__ requires only the name of the commodity, options are <a href="https://github.com/chutified/commodity-prices#supported-commodities">commodities</a>.
 ```proto
 message CommodityRequest {
     string Name = 1;
@@ -93,7 +93,7 @@ message CommodityRequest {
 }
 ```
 
-__CommodityResponse__ holds the name of the commodity that was requested and its current market price. Response also has data about the last update: Unix time, change in the percentages and in the float.
+__CommodityResponse__ holds the name of the commodity that was requested and the commodity's current market price. Response also has data of last update: Unix time, change in the percentages and in the float.
 ```proto
 message CommodityResponse {
     string Name = 1;
@@ -118,7 +118,7 @@ message CommodityResponse {
 ```
 
 ### SubscribeCommodity
-SubscribeCommodity does not respond immediately to the request but only when the commodity data are updated. It receivs the stream of CommodityRequests as the subscriptions of the client for the commodities.
+SubscribeCommodity does not respond immediately to the request but only when the commodity data are updated. It receives the stream of CommodityRequests as the subscriptions of the client for the commodities.
 
 __stream CommodityRequest__ adds the client to the subscription list for the certain commodity.
 ```bash
