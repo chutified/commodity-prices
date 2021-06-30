@@ -1,4 +1,4 @@
-module github.com/chutified/commodity-prices
+module github.com/chutommy/commodity-prices
 
 go 1.14
 

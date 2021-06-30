@@ -15,7 +15,7 @@ The Commodity-Prices service obtains all necessary data from the <a href="https:
 ### Linux/Mac
 The installation process on Windows machine would be slightly different.
 ```bash
-$ git clone https://github.com/chutified/commodity-prices.git     # download repository
+$ git clone https://github.com/chutommy/commodity-prices.git     # download repository
 $ cd commodity-prices         # move to repository dir
 $ make build                  # build docker image
 $ make run                    # initialize service
@@ -81,7 +81,7 @@ $ make run                    # initialize service
 ### GetCommodity:
 GetCommodity responds immediately to the request with the latest updated data.
 
-__CommodityRequest__ requires only the name of the commodity, options are <a href="https://github.com/chutified/commodity-prices#supported-commodities">commodities</a>.
+__CommodityRequest__ requires only the name of the commodity, options are <a href="https://github.com/chutommy/commodity-prices#supported-commodities">commodities</a>.
 ```proto
 message CommodityRequest {
     string Name = 1;
@@ -180,7 +180,7 @@ For these examples, I am using the tool called <a href="https://github.com/fulls
 ### GetCommodity
 #### Commodity.GetCommodity: `{"Name":"uranium"}`
 ```bash
-[chutified@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"uranium"}' 127.0.0.1:10501 Commodity.GetCommodity
+[chutommy@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"uranium"}' 127.0.0.1:10501 Commodity.GetCommodity
 {
     "Name": "uranium",
     "Price": 32.95,
@@ -191,7 +191,7 @@ For these examples, I am using the tool called <a href="https://github.com/fulls
 
 #### Commodity.GetCommodity: `{"Name":"rbob gasoline"}`
 ```bash
-[chutified@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"rbob gasoline"}' 127.0.0.1:10501 Commodity.GetCommodity
+[chutommy@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"rbob gasoline"}' 127.0.0.1:10501 Commodity.GetCommodity
 {
     "Name": "rbob gasoline",
     "Price": 1.23,
@@ -256,7 +256,7 @@ The service is handling the errors the non-fatal way, so all possible endpoints'
 
 #### Commodity.GetCommodity:
 ```bash
-[chutified@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"invalid"}' 127.0.0.1:10501 Commodity.GetCommodity
+[chutommy@localhost commodity-prices]$ grpcurl --plaintext -d '{"Name":"invalid"}' 127.0.0.1:10501 Commodity.GetCommodity
 ERROR:
     Code: NotFound
     Message: Name of the commodity "invalid" was not found.
@@ -269,7 +269,7 @@ ERROR:
 
 #### Commodity.SubscribeCommodity
 ```bash
-[chutified@localhost commodity-prices]$ grpcurl --plaintext -d @ 127.0.0.1:10501 Commodity.SubscribeCommodity
+[chutommy@localhost commodity-prices]$ grpcurl --plaintext -d @ 127.0.0.1:10501 Commodity.SubscribeCommodity
 {"Name":"invalid"}
 {
     "error": {
@@ -279,7 +279,7 @@ ERROR:
 }
 ```
 ```bash
-[chutified@localhost commodity-prices]$ grpcurl --plaintext 127.0.0.1:10501 Commodity.SubscribeCommodity
+[chutommy@localhost commodity-prices]$ grpcurl --plaintext 127.0.0.1:10501 Commodity.SubscribeCommodity
 ```
 
 #### Servers logs
@@ -293,7 +293,7 @@ ERROR:
 ## Client
 All clients can be built with the <a href="https://grpc.io/docs/protoc-installation/" target="_blank">Protocol Buffer Compiler</a> + <a href="https://grpc.io/" target="_blank">gRPC</a> plugin.
 
-*The protobuffer of the services:* <a href="https://github.com/chutified/commodity-prices/blob/master/protos/commodity.proto">commodity.proto</a>
+*The protobuffer of the services:* <a href="https://github.com/chutommy/commodity-prices/blob/master/protos/commodity.proto">commodity.proto</a>
 
 ## Directory structure
 ```bash

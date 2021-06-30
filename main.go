@@ -6,10 +6,10 @@ import (
 	"net"
 	"os"
 
-	config "github.com/chutified/commodity-prices/config"
-	data "github.com/chutified/commodity-prices/data"
-	commodity "github.com/chutified/commodity-prices/protos/commodity"
-	server "github.com/chutified/commodity-prices/server"
+	config "github.com/chutommy/commodity-prices/config"
+	data "github.com/chutommy/commodity-prices/data"
+	commodity "github.com/chutommy/commodity-prices/protos/commodity"
+	server "github.com/chutommy/commodity-prices/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
